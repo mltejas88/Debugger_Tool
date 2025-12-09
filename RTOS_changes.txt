@@ -1,0 +1,18 @@
+RTOS : 
+
+Changes :  
+main folder :
+Added trace.c , trace.h files into  
+Updated main.cpp , CMakeLists file
+
+freertos/config/include/freertos:
+Added freertos_trace_macros.h, trace_events.h
+Updated FreeRTOSConfig.h
+
+freertos/FreeRTOS-Kernel/include/freertos :
+Updated FreeRTOS.h from traceTASK_DELAY() to traceTASK_DELAY(xTicksToDelay)
+
+freertos/FreeRTOS-Kernel
+Updated tasks.c from traceTASK_DELAY() to traceTASK_DELAY(xTicksToDelay)
+
+
