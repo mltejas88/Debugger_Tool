@@ -1,1 +1,1 @@
-print('Hello from test_ps.py')
+print('Arigatto gosimusta!')
