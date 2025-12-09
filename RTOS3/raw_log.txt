@@ -1,0 +1,368 @@
+Executing action: monitor
+Serial port /dev/ttyUSB0
+Connecting....
+Detecting chip type... ESP32
+[0;33m--- esp-idf-monitor 1.8.0 on /dev/ttyUSB0 115200[0m
+[0;33m--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H[0m
+Running idf_monitor in directory /home/tejas/Semester3/RTOS3/RTOSExercise
+Executing "/home/tejas/.espressif/python_env/idf5.5_py3.12_env/bin/python /home/tejas/Semester3/RTOS3/RTOSExercise/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyUSB0 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 100 /home/tejas/Semester3/RTOS3/RTOSExercise/build/main.elf /home/tejas/Semester3/RTOS3/RTOSExercise/build/bootloader/bootloader.elf -m '/home/tejas/.espressif/python_env/idf5.5_py3.12_env/bin/python' '/home/tejas/Semester3/RTOS3/RTOSExercise/esp/esp-idf/tools/idf.py'"...
+[0;32mI (9) boot: ESP-IDF v5.5.1-dirty 2nd stage bootloader[0m
+[0;32mI (9) boot: compile time Dec  9 2025 16:50:25[0m
+[0;33mW (9) boot: Unicore bootloader[0m
+[0;32mI (10) boot: chip revision: v1.0[0m
+[0;32mI (13) boot.esp32: SPI Speed      : 80MHz[0m
+[0;32mI (16) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (20) boot.esp32: SPI Flash Size : 4MB[0m
+[0;32mI (24) boot: Enabling RNG early entropy source...[0m
+[0;32mI (28) boot: Partition Table:[0m
+[0;32mI (31) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (37) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (43) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (50) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (57) boot: End of partition table[0m
+[0;32mI (60) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=0feb0h ( 65200) map[0m
+[0;32mI (86) esp_image: segment 1: paddr=0001fed8 vaddr=3ffbdb60 size=00140h (   320) load[0m
+[0;32mI (86) esp_image: segment 2: paddr=00020020 vaddr=400d0020 size=2ef68h (192360) map[0m
+[0;32mI (144) esp_image: segment 3: paddr=0004ef90 vaddr=3ffbdca0 size=03164h ( 12644) load[0m
+[0;32mI (148) esp_image: segment 4: paddr=000520fc vaddr=40080000 size=1a0e4h (106724) load[0m
+[0;32mI (183) esp_image: segment 5: paddr=0006c1e8 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (196) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (196) boot: Disabling RNG early entropy source...[0m
+[0;32mI (206) cpu_start: Unicore app[0m
+[0;32mI (206) cpu_start: Single core mode[0m
+[0;32mI (270) cpu_start: Pro cpu start user code[0m
+[0;32mI (270) cpu_start: cpu freq: 240000000 Hz[0m
+[0;32mI (270) app_init: Application information:[0m
+[0;32mI (273) app_init: Project name:     main[0m
+[0;32mI (277) app_init: App version:      3912439-dirty[0m
+[0;32mI (283) app_init: Compile time:     Dec  9 2025 16:50:21[0m
+[0;32mI (289) app_init: ELF file SHA256:  8b78d9c959b80e98...[0m
+[0;32mI (295) app_init: ESP-IDF:          v5.5.1-dirty[0m
+[0;32mI (300) efuse_init: Min chip rev:     v1.0[0m
+[0;32mI (305) efuse_init: Max chip rev:     v3.99 [0m
+[0;32mI (310) efuse_init: Chip rev:         v1.0[0m
+[0;32mI (315) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (322) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM[0m
+[0;32mI (328) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM[0m
+[0;32mI (334) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM[0m
+[0;32mI (340) heap_init: At 3FFC94A0 len 00016B60 (90 KiB): DRAM[0m
+[0;32mI (346) heap_init: At 3FFE0440 len 0001FBC0 (126 KiB): D/IRAM[0m
+[0;32mI (353) heap_init: At 40078000 len 00008000 (32 KiB): IRAM[0m
+[0;32mI (359) heap_init: At 4009A0E4 len 00005F1C (23 KiB): IRAM[0m
+[0;32mI (365) heap_init: At 3FF80000 len 00002000 (8 KiB): RTCRAM[0m
+[0;32mI (372) spi_flash: detected chip: gd[0m
+[0;32mI (375) spi_flash: flash io: dio[0m
+[0;32mI (380) coexist: coex firmware version: b0bcc39[0m
+[0;32mI (385) main_task: Started on CPU0[0m
+[0;32mI (389) main_task: Calling app_main()[0m
+[0;32mI (393) app_main: Trace system initialized[0m
+[0;32mI (398) app_main: Starting scheduler from app_main()[0m
+[0;32mI (404) sharedPrinter: Printing: Item 2 produced at tick 0[0m
+[0;32mI (410) sharedPrinter: Printing: Item 3 produced at tick 6[0m
+[0;32mI (416) Producer2: Producer2 sent[0m
+[0;32mI (417) Producer3: Producer3 sent[0m
+[0;32mI (604) sharedPrinter: Printing: Item 2 produced at tick 200[0m
+[0;32mI (604) Producer2: Producer2 sent[0m
+[0;32mI (710) sharedPrinter: Printing: Item 3 produced at tick 306[0m
+[0;32mI (710) Producer3: Producer3 sent[0m
+[0;32mI (804) sharedPrinter: Printing: Item 2 produced at tick 400[0m
+[0;32mI (804) Producer2: Producer2 sent[0m
+[0;32mI (1004) sharedPrinter: Printing: Item 2 produced at tick 600[0m
+[0;32mI (1004) Producer2: Producer2 sent[0m
+[0;32mI (1010) sharedPrinter: Printing: Item 3 produced at tick 606[0m
+[0;32mI (1010) Producer3: Producer3 sent[0m
+[0;32mI (1204) sharedPrinter: Printing: Item 2 produced at tick 800[0m
+[0;32mI (1204) Producer2: Producer2 sent[0m
+[0;32mI (1310) sharedPrinter: Printing: Item 3 produced at tick 906[0m
+[0;32mI (1310) Producer3: Producer3 sent[0m
+[0;32mI (1404) sharedPrinter: Printing: Item 2 produced at tick 1000[0m
+[0;32mI (1404) Producer2: Producer2 sent[0m
+[0;32mI (1604) sharedPrinter: Printing: Item 2 produced at tick 1200[0m
+[0;32mI (1604) Producer2: Producer2 sent[0m
+[0;32mI (1610) sharedPrinter: Printing: Item 3 produced at tick 1206[0m
+[0;32mI (1610) Producer3: Producer3 sent[0m
+[0;32mI (1804) sharedPrinter: Printing: Item 2 produced at tick 1400[0m
+[0;32mI (1804) Producer2: Producer2 sent[0m
+[0;32mI (1904) Killer: Stopping tasks...[0m
+[0;32mI (1904) Killer: Final trace dump...[0m
+# ========================================
+# TRACE STATISTICS (Flush #1)
+# Total events recorded: 250
+# Buffer overwrites: 0
+# Entries in this dump: 250
+# Buffer utilization: 250/512 (48.8%)
+# ========================================
+eventtype,tick,timestamp,taskid,object,value,src
+EVT_TASK_CREATE,0,0,esp_timer,0x3ffbc70c,0,TASK
+EVT_TASK_CREATE,0,0,esp_timer,0x3ffbc860,0,TASK
+EVT_TASK_CREATE,0,0,esp_timer,0x3ffbd9b8,0,TASK
+EVT_TASK_CREATE,0,0,esp_timer,0x3ffcc814,0,TASK
+EVT_TASK_CREATE,0,0,esp_timer,0x3ffcd96c,0,TASK
+EVT_TASK_CREATE,0,0,esp_timer,0x3ffce204,0,TASK
+traceTASK_SWITCHED_IN,0,0,esp_timer,0x0,0,TASK
+traceTASK_SWITCHED_OUT,0,0,esp_timer,0x0,0,TASK
+traceTASK_SWITCHED_IN,0,0,esp_timer,0x0,0,TASK
+traceTASK_SWITCHED_OUT,0,0,esp_timer,0x0,0,TASK
+traceTASK_SWITCHED_IN,0,0,Killer,0x0,0,TASK
+EVT_TASK_DELAY,0,0,Killer,0x0,1500,TASK
+traceTASK_SWITCHED_OUT,0,0,Killer,0x0,0,TASK
+traceTASK_SWITCHED_IN,0,0,printer,0x0,0,TASK
+traceTASK_SWITCHED_OUT,0,0,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,0,0,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,0,0,Bus,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,0,0,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,0,0,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,0,0,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,0,0,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,0,0,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,6,6000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,6,6000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,6,6000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,6,6000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,6,6000,Cycle,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,6,6000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,6,6000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,6,6000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,6,6000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,12,12000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,12,12000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,12,12000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,12,12000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,12,12000,Bus,0x3ffb6a9c,0,TASK
+traceTASK_SWITCHED_OUT,13,13000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,13,13000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,13,13000,Cycle,0x3ffb6a9c,0,TASK
+traceTASK_SWITCHED_OUT,13,13000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,13,13000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,16,16000,Bus,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,16,16000,Bus,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,16,16000,Bus,0x0,200,TASK
+traceTASK_SWITCHED_OUT,16,16000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,16,16000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,20,20000,Cycle,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,20,20000,Cycle,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,20,20000,Cycle,0x0,306,TASK
+traceTASK_SWITCHED_OUT,20,20000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,20,20000,Flush,0x0,0,TASK
+traceTASK_SWITCHED_IN,20,20000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,200,200000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,200,200000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,200,200000,Bus,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,200,200000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,200,200000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,200,200000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,200,200000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,200,200000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,200,200000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,200,200000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,200,200000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,200,200000,Bus,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,200,200000,Bus,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,200,200000,Bus,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,200,200000,Bus,0x0,400,TASK
+traceTASK_SWITCHED_OUT,200,200000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,200,200000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,306,306000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,306,306000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,306,306000,Cycle,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,306,306000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,306,306000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,306,306000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,306,306000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,306,306000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,306,306000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,306,306000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,306,306000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,306,306000,Cycle,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,306,306000,Cycle,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,306,306000,Cycle,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,306,306000,Cycle,0x0,606,TASK
+traceTASK_SWITCHED_OUT,306,306000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,306,306000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,400,400000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,400,400000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,400,400000,Bus,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,400,400000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,400,400000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,400,400000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,400,400000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,400,400000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,400,400000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,400,400000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,400,400000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,400,400000,Bus,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,400,400000,Bus,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,400,400000,Bus,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,400,400000,Bus,0x0,600,TASK
+traceTASK_SWITCHED_OUT,400,400000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,400,400000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,600,600000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,600,600000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,600,600000,Bus,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,600,600000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,600,600000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,600,600000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,600,600000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,600,600000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,600,600000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,600,600000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,600,600000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,600,600000,Bus,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,600,600000,Bus,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,600,600000,Bus,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,600,600000,Bus,0x0,800,TASK
+traceTASK_SWITCHED_OUT,600,600000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,600,600000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,606,606000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,606,606000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,606,606000,Cycle,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,606,606000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,606,606000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,606,606000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,606,606000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,606,606000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,606,606000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,606,606000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,606,606000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,606,606000,Cycle,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,610,610000,Cycle,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,610,610000,Cycle,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,610,610000,Cycle,0x0,906,TASK
+traceTASK_SWITCHED_OUT,610,610000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,610,610000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,800,800000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,800,800000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,800,800000,Bus,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,800,800000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,800,800000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,800,800000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,800,800000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,800,800000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,800,800000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,800,800000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,800,800000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,800,800000,Bus,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,800,800000,Bus,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,800,800000,Bus,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,800,800000,Bus,0x0,1000,TASK
+traceTASK_SWITCHED_OUT,800,800000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,800,800000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,906,906000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,906,906000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,906,906000,Cycle,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,906,906000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,906,906000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,906,906000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,906,906000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,906,906000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,906,906000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,906,906000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,906,906000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,906,906000,Cycle,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,906,906000,Cycle,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,906,906000,Cycle,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,906,906000,Cycle,0x0,1206,TASK
+traceTASK_SWITCHED_OUT,906,906000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,906,906000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,1000,1000000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,1000,1000000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,1000,1000000,Bus,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,1000,1000000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,1000,1000000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,1000,1000000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,1000,1000000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1000,1000000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1000,1000000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,1000,1000000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,1000,1000000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,1000,1000000,Bus,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1000,1000000,Bus,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1000,1000000,Bus,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,1000,1000000,Bus,0x0,1200,TASK
+traceTASK_SWITCHED_OUT,1000,1000000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,1000,1000000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,1200,1200000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,1200,1200000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,1200,1200000,Bus,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,1200,1200000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,1200,1200000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,1200,1200000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,1200,1200000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1200,1200000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1200,1200000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,1200,1200000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,1200,1200000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,1200,1200000,Bus,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1200,1200000,Bus,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1200,1200000,Bus,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,1200,1200000,Bus,0x0,1400,TASK
+traceTASK_SWITCHED_OUT,1200,1200000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,1200,1200000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,1206,1206000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,1206,1206000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,1206,1206000,Cycle,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,1206,1206000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,1206,1206000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,1206,1206000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,1206,1206000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1206,1206000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1206,1206000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,1206,1206000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,1206,1206000,Cycle,0x0,0,TASK
+EVT_QUEUE_SEND,1206,1206000,Cycle,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1210,1210000,Cycle,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1210,1210000,Cycle,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,1210,1210000,Cycle,0x0,1506,TASK
+traceTASK_SWITCHED_OUT,1210,1210000,Cycle,0x0,0,TASK
+traceTASK_SWITCHED_IN,1210,1210000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,1400,1400000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,1400,1400000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,1400,1400000,Bus,0x3ffb9d04,0,TASK
+traceTASK_SWITCHED_OUT,1400,1400000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,1400,1400000,printer,0x0,0,TASK
+EVT_QUEUE_RECEIVE,1400,1400000,printer,0x3ffb9d04,0,TASK
+EVT_QUEUE_SEND,1400,1400000,printer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1400,1400000,printer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1400,1400000,printer,0x3ffb68cc,0,TASK
+traceTASK_SWITCHED_OUT,1400,1400000,printer,0x0,0,TASK
+traceTASK_SWITCHED_IN,1400,1400000,Bus,0x0,0,TASK
+EVT_QUEUE_SEND,1400,1400000,Bus,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1400,1400000,Bus,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1400,1400000,Bus,0x3ffb68cc,0,TASK
+EVT_TASK_DELAY_UNTIL,1400,1400000,Bus,0x0,1600,TASK
+traceTASK_SWITCHED_OUT,1400,1400000,Bus,0x0,0,TASK
+traceTASK_SWITCHED_IN,1400,1400000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,1500,1500000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_IN,1500,1500000,Killer,0x0,0,TASK
+EVT_QUEUE_SEND,1500,1500000,Killer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1500,1500000,Killer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1500,1500000,Killer,0x3ffb68cc,0,TASK
+EVT_TASK_DELETE,1500,1500000,Killer,0x3ffbd9b8,0,TASK
+EVT_TASK_DELETE,1500,1500000,Killer,0x3ffcc814,0,TASK
+EVT_TASK_DELETE,1500,1500000,Killer,0x3ffcd96c,0,TASK
+EVT_QUEUE_SEND,1500,1500000,Killer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,1500,1500000,Killer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,1500,1500000,Killer,0x3ffb68cc,0,TASK
+# ========================================
+
+[0;32mI (3045) Killer: All tasks terminated[0m
+[0;32mI (5424) Flush: === TRACE DUMP START ===[0m
+# ========================================
+# TRACE STATISTICS (Flush #2)
+# Total events recorded: 257
+# Buffer overwrites: 0
+# Entries in this dump: 7
+# Buffer utilization: 7/512 (1.4%)
+# ========================================
+eventtype,tick,timestamp,taskid,object,value,src
+EVT_QUEUE_SEND,2641,2641000,Killer,0x3ffb6a9c,0,TASK
+EVT_QUEUE_SEND,2645,2645000,Killer,0x3ffb7f7c,0,TASK
+EVT_QUEUE_SEND,2645,2645000,Killer,0x3ffb68cc,0,TASK
+EVT_TASK_DELETE,2645,2645000,Killer,0x3ffbc70c,0,TASK
+traceTASK_SWITCHED_OUT,2645,2645000,Killer,0x0,0,TASK
+traceTASK_SWITCHED_IN,2645,2645000,IDLE,0x0,0,TASK
+traceTASK_SWITCHED_OUT,5020,5020000,IDLE,0x0,0,TASK
+# ========================================
+
+[0;32mI (5479) Flush: === TRACE DUMP END ===[0m
+[0m

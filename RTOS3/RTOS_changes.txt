@@ -13,3 +13,16 @@ FreeRTOS-Kernel/include/freertos :
 Updated tasks.c and FreeRTOS.h from traceTASK_DELAY() to traceTASK_DELAY(xTicksToDelay)
 
 
+
+
+
+Command to run:  
+
+Terminal 1 : idf.py build flash
+             idf.py monitor 2>&1 | tee raw_log.txt
+
+Terminal 2(~/Semester3/RTOS3/.rtos) : python3 parse_trace_log.py raw_log.txt log_entries.csv
+                                      python visualize.py log_entries.csv output.pdf
+
+
+             

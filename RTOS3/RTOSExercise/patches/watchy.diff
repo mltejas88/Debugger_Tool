@@ -1,0 +1,28 @@
+diff --git a/src/config.h b/src/config.h
+index 6add348..0533f97 100644
+--- a/src/config.h
++++ b/src/config.h
+@@ -1,6 +1,6 @@
+ #ifndef CONFIG_H
+ #define CONFIG_H
+-
++#include "driver/gpio.h"
+ // Versioning
+ #define WATCHY_LIB_VER "1.4.14"
+ 
+@@ -48,7 +48,7 @@
+ #pragma message "Hardware revision is not defined at the project level, please define in config.h. Defaulting to ARDUINO_WATCHY_V20"
+ 
+ #define ARDUINO_WATCHY_V20
+-
++#endif
+ #define MENU_BTN_PIN 26
+ #define BACK_BTN_PIN 25
+ #define DOWN_BTN_PIN 4
+@@ -116,5 +116,3 @@
+ #define SOFTWARE_VERSION_PATCH 0
+ #define HARDWARE_VERSION_MAJOR 1
+ #define HARDWARE_VERSION_MINOR 0
+-
+-#endif
+\ No newline at end of file
