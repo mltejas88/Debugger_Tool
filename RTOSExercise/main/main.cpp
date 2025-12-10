@@ -41,7 +41,7 @@ void initDisplay(void* pvParameters) {
     display.setTextColor(GxEPD_BLACK);
     display.setFont(&FreeMonoBold24pt7b);
     display.setCursor(0, 90);
-    display.print("Hello\nWorld!");
+    display.print("PSPS");
     display.display(false);
 
     /* Delete the display initialization task. */
