@@ -23,6 +23,9 @@ Terminal 1 : idf.py build flash
 
 Terminal 2(~/Semester3/RTOS3/.rtos) : python3 parse_trace_log.py raw_log.txt log_entries.csv
                                       python visualize.py log_entries.csv output.pdf
+                                      
+                                      
+                                     
 
 
-             
+Work on another buffer: THis is needed when you task killer runs for longer time than flush and during flush these task executes which are not recorded in buffer as it is present in flush state .             

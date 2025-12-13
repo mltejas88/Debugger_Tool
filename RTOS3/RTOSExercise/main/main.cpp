@@ -179,7 +179,7 @@ void flushTask(void *pvParameters) {
     trace_set_flush_task(xTaskGetCurrentTaskHandle());
     
     for (;;) {
-        vTaskDelay(pdMS_TO_TICKS(5000));  // Flush every 5 seconds
+        vTaskDelay(pdMS_TO_TICKS(2000));  // Flush every 5 seconds
         ESP_LOGI("Flush", "=== TRACE DUMP START ===");
         trace_flush();
         ESP_LOGI("Flush", "=== TRACE DUMP END ===");
@@ -188,7 +188,7 @@ void flushTask(void *pvParameters) {
 
 void taskKiller(void *pvParameters)
 {
-    vTaskDelay(pdMS_TO_TICKS(1500));   // Wait 10 seconds
+    vTaskDelay(pdMS_TO_TICKS(15000));   // Wait 10 seconds
 
     ESP_LOGI("Killer", "Stopping tasks...");
     
@@ -198,8 +198,8 @@ void taskKiller(void *pvParameters)
     vTaskDelete(hPrinter);
 
     // Final flush before exiting
-    ESP_LOGI("Killer", "Final trace dump...");
-    trace_flush();
+    //ESP_LOGI("Killer", "Final trace dump...");
+    //trace_flush();
     
     ESP_LOGI("Killer", "All tasks terminated");
     vTaskDelete(NULL);
