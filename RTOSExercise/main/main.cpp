@@ -37,11 +37,11 @@ void initDisplay(void* pvParameters) {
     /* Init the display. */
     display.epd2.initWatchy();
     display.setFullWindow();
-    display.fillScreen(GxEPD_WHITE);
-    display.setTextColor(GxEPD_BLACK);
+    display.fillScreen(GxEPD_BLACK);
+    display.setTextColor(GxEPD_WHITE);
     display.setFont(&FreeMonoBold24pt7b);
     display.setCursor(0, 90);
-    display.print("PSPS");
+    display.print("Hello\nWorld!");
     display.display(false);
 
     /* Delete the display initialization task. */
@@ -84,7 +84,7 @@ void buttonWatch(void* pvParameters) {
             display.fillRoundRect(150, 0, 50, 50, 20, GxEPD_WHITE);
             display.display(true);
             refresh++;
-        } else if (refresh >= 10) {
+        } else if (refresh >= 2) {
             ESP_LOGI("buttonWatch", "Performing full refresh of display");
             display.display(false);
             refresh = 0;
