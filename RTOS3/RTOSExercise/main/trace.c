@@ -1,5 +1,5 @@
 /* trace.c - Compact trace system for ESP32
- * Double-buffered ring buffer with overwrite policy and statistics
+ * Double-buffered ring buffer with overwrite minimization
  */
 
 #include "trace.h"
@@ -7,6 +7,9 @@
 
 /* Buffer size */
 #define TRACE_BUFFER_SIZE 768
+
+/* High watermark to trigger early flush (75%) */
+#define TRACE_HIGH_WATERMARK (TRACE_BUFFER_SIZE * 3 / 4)
 
 /* Trace entry */
 typedef struct {
@@ -27,24 +30,27 @@ typedef struct {
     uint32_t overwrite_count;
 } trace_ring_t;
 
-/* Two buffers: ping-pong */
+/* Two buffers */
 static trace_ring_t rings[2];
 static volatile uint8_t active_ring = 0;
 
-/* Global statistics */
+/* Global stats */
 static volatile uint32_t total_written = 0;
 static volatile uint32_t flush_count = 0;
 
-/* Flush task handle (recursion protection) */
+/* Flush signaling */
+static volatile uint8_t flush_requested = 0;
+
+/* Flush task handle */
 static TaskHandle_t flush_task = NULL;
 
-/* Get timestamp in microseconds */
+/* Timestamp helper */
 static inline uint32_t get_us(void) {
     return (uint32_t)((uint64_t)xTaskGetTickCount() * 1000000ULL /
                       (uint64_t)configTICK_RATE_HZ);
 }
 
-/* Initialize trace system */
+/* Init */
 void trace_init(void) {
     taskENTER_CRITICAL(NULL);
     for (int i = 0; i < 2; i++) {
@@ -55,11 +61,12 @@ void trace_init(void) {
     active_ring = 0;
     total_written = 0;
     flush_count = 0;
+    flush_requested = 0;
     flush_task = NULL;
     taskEXIT_CRITICAL(NULL);
 }
 
-/* Record trace from task context */
+/* Record from task */
 void trace_record_task(TraceEvent event, void *object, int value) {
     TaskHandle_t current = xTaskGetCurrentTaskHandle();
     if (current == flush_task) return;
@@ -81,6 +88,9 @@ void trace_record_task(TraceEvent event, void *object, int value) {
 
     if (r->count < TRACE_BUFFER_SIZE) {
         r->count++;
+        if (r->count >= TRACE_HIGH_WATERMARK) {
+            flush_requested = 1;
+        }
     } else {
         r->overwrite_count++;
     }
@@ -89,7 +99,7 @@ void trace_record_task(TraceEvent event, void *object, int value) {
     taskEXIT_CRITICAL(NULL);
 }
 
-/* Record trace from ISR context */
+/* Record from ISR */
 void trace_record_isr(TraceEvent event, void *object, int value) {
 #ifdef portSET_INTERRUPT_MASK_FROM_ISR
     UBaseType_t mask = portSET_INTERRUPT_MASK_FROM_ISR();
@@ -116,6 +126,9 @@ void trace_record_isr(TraceEvent event, void *object, int value) {
 
     if (r->count < TRACE_BUFFER_SIZE) {
         r->count++;
+        if (r->count >= TRACE_HIGH_WATERMARK) {
+            flush_requested = 1;
+        }
     } else {
         r->overwrite_count++;
     }
@@ -129,7 +142,6 @@ void trace_record_isr(TraceEvent event, void *object, int value) {
 #endif
 }
 
-/* Event to string */
 static const char* evt2str(TraceEvent e) {
     switch (e) {
         case EVT_QUEUE_SEND: return "EVT_QUEUE_SEND";
@@ -152,65 +164,78 @@ static const char* evt2str(TraceEvent e) {
     }
 }
 
-/* Flush trace buffer */
+
+/* Flush with chaining */
 void trace_flush(void) {
     static trace_entry_t snap[TRACE_BUFFER_SIZE];
 
-    uint8_t flush_ring;
-    uint32_t n, start;
-    uint32_t total, overwrites, flushes;
+    for (;;) {
+        uint8_t flush_ring;
+        uint32_t n, start;
+        uint32_t total, overwrites, flushes;
 
-    /* Atomic buffer swap */
-    taskENTER_CRITICAL(NULL);
-    flush_ring = active_ring;
-    active_ring ^= 1;
+        taskENTER_CRITICAL(NULL);
+        flush_ring = active_ring;
+        active_ring ^= 1;
 
-    trace_ring_t *r = &rings[flush_ring];
+        trace_ring_t *r = &rings[flush_ring];
 
-    n = r->count;
-    overwrites = r->overwrite_count;
-    total = total_written;
-    flush_count++;
-    flushes = flush_count;
+        n = r->count;
+        overwrites = r->overwrite_count;
+        total = total_written;
+        flush_count++;
+        flushes = flush_count;
 
-    if (n > 0) {
-        start = (r->wr_idx >= n) ?
-                (r->wr_idx - n) :
-                (TRACE_BUFFER_SIZE + r->wr_idx - n);
+        if (n > 0) {
+            start = (r->wr_idx >= n) ?
+                    (r->wr_idx - n) :
+                    (TRACE_BUFFER_SIZE + r->wr_idx - n);
+
+            for (uint32_t i = 0; i < n; i++) {
+                snap[i] = r->buffer[(start + i) % TRACE_BUFFER_SIZE];
+            }
+        }
+
+        r->count = 0;
+        r->wr_idx = 0;
+        r->overwrite_count = 0;
+
+        taskEXIT_CRITICAL(NULL);
+
+        if (n == 0) break;
+
+        printf("# ========================================\n");
+        printf("# TRACE STATISTICS (Flush #%lu)\n", (unsigned long)flushes);
+        printf("# Total events recorded: %lu\n", (unsigned long)total);
+        printf("# Buffer overwrites: %lu\n", (unsigned long)overwrites);
+        printf("# Entries in this dump: %lu\n", (unsigned long)n);
+        printf("# Buffer utilization: %lu/%d (%.1f%%)\n",
+               (unsigned long)n, TRACE_BUFFER_SIZE,
+               (100.0f * n) / TRACE_BUFFER_SIZE);
+        printf("# ========================================\n");
+
+        printf("eventtype,tick,timestamp,taskid,object,value,src\n");
 
         for (uint32_t i = 0; i < n; i++) {
-            snap[i] = r->buffer[(start + i) % TRACE_BUFFER_SIZE];
-        }
-    }
+            trace_entry_t *e = &snap[i];
 
-    r->count = 0;
-    r->wr_idx = 0;
-    r->overwrite_count = 0;
+            /* For TASK CREATE / DELETE, object is a task name (char*) */
+            if (e->event == EVT_TASK_CREATE ||
+            e->event == EVT_TASK_DELETE ||
+            e->event == EVT_TASK_CREATE_FAILED) {
 
-    taskEXIT_CRITICAL(NULL);
-
-    if (n == 0) {
-        printf("# TRACE: No entries to flush\n");
-        return;
-    }
-
-    printf("# ========================================\n");
-printf("# TRACE STATISTICS (Flush #%lu)\n", (unsigned long)flushes);
-printf("# Total events recorded: %lu\n", (unsigned long)total);
-printf("# Buffer overwrites: %lu\n", (unsigned long)overwrites);
-printf("# Entries in this dump: %lu\n", (unsigned long)n);
-printf("# Buffer utilization: %lu/%d (%.1f%%)\n",
-       (unsigned long)n,
-       TRACE_BUFFER_SIZE,
-       (100.0f * n) / TRACE_BUFFER_SIZE);
-printf("# ========================================\n");
-
-
-    printf("eventtype,tick,timestamp,taskid,object,value,src\n");
-
-    for (uint32_t i = 0; i < n; i++) {
-        trace_entry_t *e = &snap[i];
-        printf("%s,%lu,%lu,%s,%p,%lu,%s\n",
+                printf("%s,%lu,%lu,%s,%s,%lu,%s\n",
+               evt2str(e->event),
+               (unsigned long)e->tick,
+               (unsigned long)e->time_us,
+               e->task ? pcTaskGetName(e->task) : "ISR",
+               e->object ? (const char*)e->object : "",
+               (unsigned long)e->value,
+               e->from_isr ? "ISR" : "TASK");
+            }
+            /* All other events: object is a pointer */
+            else {
+                printf("%s,%lu,%lu,%s,%p,%lu,%s\n",
                evt2str(e->event),
                (unsigned long)e->tick,
                (unsigned long)e->time_us,
@@ -218,22 +243,27 @@ printf("# ========================================\n");
                e->object,
                (unsigned long)e->value,
                e->from_isr ? "ISR" : "TASK");
+            }
+        }
+
+        printf("# ========================================\n\n");
+
+        /* Check if the other buffer filled while we were flushing */
+        taskENTER_CRITICAL(NULL);
+        uint32_t pending = rings[active_ring].count;
+        flush_requested = 0;
+        taskEXIT_CRITICAL(NULL);
+
+        if (pending == 0) {
+            break;  // nothing more to flush
+        }
     }
-
-    printf("# ========================================\n\n");
 }
 
-/* Alias */
-void trace_force_flush(void) {
-    trace_flush();
-}
+/* Helpers */
+void trace_force_flush(void) { trace_flush(); }
+void trace_set_flush_task(TaskHandle_t t) { flush_task = t; }
 
-/* Register flush task */
-void trace_set_flush_task(TaskHandle_t t) {
-    flush_task = t;
-}
-
-/* Get statistics */
 void trace_get_stats(uint32_t *total, uint32_t *overwrites, uint32_t *entries) {
     taskENTER_CRITICAL(NULL);
     if (total) *total = total_written;

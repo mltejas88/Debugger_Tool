@@ -44,12 +44,29 @@ void trace_record_isr(TraceEvent event, void *object, int value);
 #define traceTASK_INCREMENT_TICK(xTickCount) \
     trace_record_task(EVT_TASK_INCREMENT_TICK, NULL, (int)((xTickCount) + 1)) */
 
-#define traceTASK_CREATE(pxNewTCB) \
+/*#define traceTASK_CREATE(pxNewTCB) \
     trace_record_task(EVT_TASK_CREATE, (void*)(pxNewTCB), 0)
 #define traceTASK_CREATE_FAILED() \
     trace_record_task(EVT_TASK_CREATE_FAILED, NULL, 0)
 #define traceTASK_DELETE(pxTaskToDelete) \
-    trace_record_task(EVT_TASK_DELETE, (void*)(pxTaskToDelete), 0)
+    trace_record_task(EVT_TASK_DELETE, (void*)(pxTaskToDelete), 0)*/
+
+#define traceTASK_CREATE(pxNewTCB)                                   \
+    trace_record_task(                                              \
+        EVT_TASK_CREATE,                                            \
+        (void*)pcTaskGetName((TaskHandle_t)(pxNewTCB)),             \
+        0                                                           \
+    )
+
+#define traceTASK_CREATE_FAILED() \
+    trace_record_task(EVT_TASK_CREATE_FAILED, NULL, 0)
+
+#define traceTASK_DELETE(pxTaskToDelete)                              \
+    trace_record_task(                                               \
+        EVT_TASK_DELETE,                                             \
+        (void*)pcTaskGetName((TaskHandle_t)(pxTaskToDelete)),        \
+        0                                                            \
+    )
 
 #define traceTASK_DELAY(ticksToDelay) \
     trace_record_task(EVT_TASK_DELAY, NULL, (int)(ticksToDelay))
