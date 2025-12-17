@@ -1,31 +1,13 @@
 #!/usr/bin/env python3
-"""
-RTOS Trace Visualizer — Interactive (SECTIONS)
-
-Creates separate interactive HTML files:
-1) CPU Schedule        -> <prefix>_cpu.html
-2) Task Lifecycle      -> <prefix>_lifecycle.html
-3) Blocking / Waiting  -> <prefix>_blocking.html
-(Optional) Raw Events  -> <prefix>_events.html
-
-Uses Plotly rectangle SHAPES to ensure ultra-thin segments (0–1 tick) are visible.
-
-Usage:
-  python3 visualize_interactive_sections.py path/to/log_entries.csv
-  python3 visualize_interactive_sections.py path/to/log_entries.csv --out-prefix report
-  python3 visualize_interactive_sections.py path/to/log_entries.csv --xmin -10 --xmax 12000
-  python3 visualize_interactive_sections.py path/to/log_entries.csv --table 500
-  python3 visualize_interactive_sections.py path/to/log_entries.csv --table -1   # ALL rows (slow)
-  python3 visualize_interactive_sections.py path/to/log_entries.csv --no-open
-"""
-
 import argparse
 import os
 import webbrowser
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import plotly.io as pio
 
 EXCLUDE_TASKS = {"Flush"}
@@ -51,15 +33,17 @@ def load_csv(path: str) -> pd.DataFrame:
 def infer_xrange(df: pd.DataFrame, xmin_arg, xmax_arg):
     dmin = int(df["tick"].min()) if not df.empty else 0
     dmax = int(df["tick"].max()) if not df.empty else 0
+
     xmin = xmin_arg if xmin_arg is not None else dmin - 10
     xmax = xmax_arg if xmax_arg is not None else dmax + 10
+
     if xmax <= xmin:
         xmax = xmin + 1
-    return int(xmin), int(xmax)
+    return int(xmin), int(xmax), dmin, dmax
 
 
 # -----------------------
-# CPU Timeline
+# CPU Timeline (same logic as PDF version)
 # -----------------------
 def build_cpu_timeline(df: pd.DataFrame, xmin: int, xmax: int):
     timeline = []
@@ -90,12 +74,15 @@ def build_cpu_timeline(df: pd.DataFrame, xmin: int, xmax: int):
 # -----------------------
 def extract_lifecycle(df: pd.DataFrame, xmax: int):
     creates, deletes = {}, {}
+
     for _, r in df.iterrows():
         ev = r["eventtype"]
         tick = int(r["tick"])
         obj = r["object"]
+
         if obj in EXCLUDE_TASKS:
             continue
+
         if ev == "EVT_TASK_CREATE":
             creates.setdefault(obj, tick)
         elif ev == "EVT_TASK_DELETE":
@@ -148,7 +135,7 @@ def extract_blocking(df: pd.DataFrame):
 
 
 # -----------------------
-# Task list
+# Task list (include everything seen)
 # -----------------------
 def stable_task_list(df, cpu_timeline, lifecycle_segments, blocking):
     tasks = set()
@@ -171,40 +158,55 @@ def stable_task_list(df, cpu_timeline, lifecycle_segments, blocking):
                 tasks.add(t)
 
     tasks = sorted(tasks)
+
+    # keep IDLE visible
     if "IDLE" in tasks:
         tasks.remove("IDLE")
         tasks.insert(max(0, len(tasks) // 2), "IDLE")
+
     return tasks
 
 
 # -----------------------
-# Shape plot helper (single-figure)
+# Colors (colorful CPU by task)
 # -----------------------
-def make_shape_figure(title: str, tasks, xmin: int, xmax: int):
-    fig = go.Figure()
-    fig.update_layout(
-        title=title,
-        height=max(450, 120 + len(tasks) * 22),
-        hovermode="closest",
-        margin=dict(l=70, r=20, t=70, b=50),
-    )
-    fig.update_xaxes(range=[xmin, xmax], title_text="Tick")
-    fig.update_yaxes(
-        tickmode="array",
-        tickvals=list(range(len(tasks))),
-        ticktext=tasks,
-        autorange="reversed",
-    )
-    return fig
+def make_task_color_map(tasks):
+    # Plotly qualitative palette (nice & colorful)
+    palette = [
+        "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+        "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
+        "#393b79", "#637939", "#8c6d31", "#843c39", "#7b4173",
+        "#3182bd", "#e6550d", "#31a354", "#756bb1", "#636363",
+    ]
+    cmap = {}
+    i = 0
+    for t in tasks:
+        if t == "IDLE":
+            cmap[t] = "rgba(180,180,180,0.35)"
+        else:
+            c = palette[i % len(palette)]
+            cmap[t] = c
+            i += 1
+    return cmap
 
 
-def add_segments(fig, segments, tasks, fillcolor):
+# -----------------------
+# Shape segments + hover
+# -----------------------
+def axis_suffix(row: int) -> str:
+    return "" if row == 1 else str(row)
+
+
+def add_segments_as_shapes(fig, row, segments, tasks, color_fn, hover_name):
     y_index = {t: i for i, t in enumerate(tasks)}
+    suf = axis_suffix(row)
+    xref, yref = f"x{suf}", f"y{suf}"
 
-    # Shapes
+    # Draw shapes
     for task, s, e, hover in segments:
         if task not in y_index:
             continue
+
         y = y_index[task]
         y0, y1 = y - 0.35, y + 0.35
 
@@ -212,29 +214,37 @@ def add_segments(fig, segments, tasks, fillcolor):
         if disp_e <= disp_s:
             disp_e = disp_s + MIN_VISIBLE_WIDTH
 
+        fillcolor, linecolor = color_fn(task)
+
         fig.add_shape(
             type="rect",
             x0=disp_s, x1=disp_e,
             y0=y0, y1=y1,
-            xref="x", yref="y",
-            line=dict(color="black", width=1),
+            xref=xref, yref=yref,
+            line=dict(color=linecolor, width=1),
             fillcolor=fillcolor,
             opacity=0.9,
             layer="below",
         )
 
-    # Hover points (invisible)
+    # Hover markers (invisible)
     hx, hy, htext = [], [], []
     for task, s, e, hover in segments:
         if task not in y_index:
             continue
+
         hx.append((float(s) + float(e)) / 2.0)
         hy.append(y_index[task])
 
         extra = ""
         if hover:
             extra = "<br>" + "<br>".join([f"{k}: {v}" for k, v in hover.items()])
-        htext.append(f"<b>{task}</b><br>start: {s}<br>end: {e}<br>dur: {e-s}{extra}")
+
+        htext.append(
+            f"<b>{hover_name}</b><br>"
+            f"<b>{task}</b><br>"
+            f"start: {s}<br>end: {e}<br>dur: {e - s}{extra}"
+        )
 
     fig.add_trace(
         go.Scatter(
@@ -244,37 +254,177 @@ def add_segments(fig, segments, tasks, fillcolor):
             hovertemplate="%{text}<extra></extra>",
             text=htext,
             showlegend=False,
-        )
+        ),
+        row=row, col=1
     )
 
 
-def write_html(fig, out_path: Path):
-    pio.write_html(fig, file=str(out_path), include_plotlyjs="cdn", full_html=True)
-
-
-# -----------------------
-# Optional events table
-# -----------------------
-def make_events_table_figure(df: pd.DataFrame, title: str, table_rows: int):
+def make_events_table(df: pd.DataFrame, table_rows: int):
     if table_rows == 0:
         return None
     d = df if table_rows < 0 else df.head(table_rows)
     d = d.fillna("").astype(str)
 
-    fig = go.Figure(
-        data=[
-            go.Table(
-                header=dict(values=list(d.columns)),
-                cells=dict(values=[d[c].tolist() for c in d.columns]),
-            )
-        ]
+    return go.Table(
+        header=dict(values=list(d.columns)),
+        cells=dict(values=[d[c].tolist() for c in d.columns]),
     )
+
+
+# -----------------------
+# Global X-max slider
+# -----------------------
+def build_global_xmax_slider(xmin, dmax, xmax_initial, steps=150):
+    """
+    One-handle slider that changes x-axis MAX for xaxis, xaxis2, xaxis3 together.
+    """
+    xmax_min = max(xmin + 1, int(xmin + 10))
+    xmax_max = max(xmax_initial, int(dmax + 10))
+
+    # keep steps reasonable
+    steps = max(10, int(steps))
+    values = np.linspace(xmax_min, xmax_max, steps).astype(int)
+    values = np.unique(values)
+
+    slider_steps = []
+    for v in values:
+        slider_steps.append({
+            "method": "relayout",
+            "args": [
+                {
+                    "xaxis.range": [xmin, int(v)],
+                    "xaxis2.range": [xmin, int(v)],
+                    "xaxis3.range": [xmin, int(v)],
+                }
+            ],
+            "label": str(int(v)),
+        })
+
+    # Find closest active index
+    active = int(np.argmin(np.abs(values - xmax_initial)))
+
+    slider = {
+        "active": active,
+        "currentvalue": {"prefix": "Global X max: "},
+        "pad": {"t": 10, "b": 10},
+        "steps": slider_steps,
+    }
+    return [slider]
+
+
+# -----------------------
+# Build report (single HTML)
+# -----------------------
+def build_report(df, xmin, xmax, dmax, out_html: Path, table_rows: int, slider_steps: int):
+    cpu_tl = build_cpu_timeline(df, xmin, xmax)
+    life, creates, deletes = extract_lifecycle(df, xmax)
+    blocking = extract_blocking(df)
+
+    tasks = stable_task_list(df, cpu_tl, life, blocking)
+    task_colors = make_task_color_map(tasks)
+
+    def cpu_color_fn(task):
+        # CPU: colorful per task
+        if task == "IDLE":
+            return ("rgba(180,180,180,0.35)", "rgba(130,130,130,1.0)")
+        c = task_colors.get(task, "#1f77b4")
+        return (c, "rgba(0,0,0,1.0)")
+
+    def lifecycle_color_fn(_task):
+        return ("rgba(0,200,0,0.30)", "rgba(0,120,0,1.0)")
+
+    def block_color_fn(_task_kind):
+        # color decided by hover kind; we pass task anyway, so just neutral
+        return ("rgba(120,120,120,0.0)", "rgba(0,0,0,0.0)")
+
+    fig = make_subplots(
+        rows=4 if table_rows != 0 else 3,
+        cols=1,
+        specs=(
+            [[{"type": "xy"}], [{"type": "xy"}], [{"type": "xy"}], [{"type": "table"}]]
+            if table_rows != 0 else
+            [[{"type": "xy"}], [{"type": "xy"}], [{"type": "xy"}]]
+        ),
+        row_heights=([0.30, 0.30, 0.30, 0.30] if table_rows != 0 else [0.34, 0.33, 0.33]),
+        vertical_spacing=0.08,
+        subplot_titles=(
+            ["CPU Schedule", "Task Lifecycle (Create → Delete)", "Task Blocking / Waiting", "Raw Events (CSV)"]
+            if table_rows != 0 else
+            ["CPU Schedule", "Task Lifecycle (Create → Delete)", "Task Blocking / Waiting"]
+        ),
+    )
+
+    # CPU segments
+    cpu_segments = [(t, s, e, {"plot": "CPU"}) for (t, s, e) in cpu_tl]
+    add_segments_as_shapes(fig, 1, cpu_segments, tasks, cpu_color_fn, "CPU")
+
+    # Lifecycle segments
+    life_segments = [
+        (t, s, e, {"created": creates.get(t, ""), "deleted": deletes.get(t, "")})
+        for (t, s, e) in life
+    ]
+    add_segments_as_shapes(fig, 2, life_segments, tasks, lifecycle_color_fn, "Lifecycle")
+
+    # Blocking segments (two overlays)
+    block_queue, block_delay = [], []
+    for kind, m in blocking.items():
+        for t, segs in m.items():
+            for s, e in segs:
+                item = (t, s, e, {"kind": kind})
+                (block_queue if kind == "QUEUE" else block_delay).append(item)
+
+    # Blocking colors depend on kind; implement via two calls:
+    def queue_color_fn(_task):  # orange
+        return ("rgba(255,165,0,0.40)", "rgba(150,90,0,1.0)")
+
+    def delay_color_fn(_task):  # gray-blue
+        return ("rgba(100,100,180,0.30)", "rgba(60,60,120,1.0)")
+
+    if block_queue:
+        add_segments_as_shapes(fig, 3, block_queue, tasks, queue_color_fn, "Blocking (QUEUE)")
+    if block_delay:
+        add_segments_as_shapes(fig, 3, block_delay, tasks, delay_color_fn, "Blocking (DELAY)")
+
+    # Table
+    if table_rows != 0:
+        table = make_events_table(df, table_rows)
+        if table is not None:
+            fig.add_trace(table, row=4, col=1)
+
+    # Axes
+    for r in (1, 2, 3):
+        fig.update_yaxes(
+            row=r, col=1,
+            tickmode="array",
+            tickvals=list(range(len(tasks))),
+            ticktext=tasks,
+            autorange="reversed",
+        )
+        fig.update_xaxes(row=r, col=1, range=[xmin, xmax], title_text="Tick")
+
+    # Layout + global slider
     fig.update_layout(
-        title=title,
-        height=700,
-        margin=dict(l=20, r=20, t=70, b=30),
+        height=1300 if table_rows != 0 else 1050,
+        title="RTOS Trace Visualizer",
+        hovermode="closest",
+        margin=dict(l=60, r=30, t=80, b=40),
+        sliders=build_global_xmax_slider(xmin, dmax, xmax, steps=slider_steps),
     )
-    return fig
+
+    # Important: keep editing minimal
+    # (No draw tools; no editable=True)
+    config = {
+        "displaylogo": False,
+        "modeBarButtonsToRemove": [
+            "drawline", "drawopenpath", "drawclosedpath", "drawcircle",
+            "drawrect", "eraseshape", "lasso2d", "select2d"
+        ],
+        "responsive": True,
+    }
+
+    # write html with config embedded
+    html = pio.to_html(fig, include_plotlyjs="cdn", full_html=True, config=config)
+    out_html.write_text(html, encoding="utf-8")
 
 
 # -----------------------
@@ -283,77 +433,29 @@ def make_events_table_figure(df: pd.DataFrame, title: str, table_rows: int):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("csv", help="Path to log_entries.csv")
-    ap.add_argument("--out-prefix", default=None, help="Output prefix (default: CSV stem)")
+    ap.add_argument("--out", default=None, help="Output HTML filename")
     ap.add_argument("--xmin", type=int, default=None)
     ap.add_argument("--xmax", type=int, default=None)
     ap.add_argument("--no-open", action="store_true")
-    ap.add_argument("--table", type=int, default=0,
-                    help="Raw events table rows: 0=disable, N=first N rows, -1=ALL (slow)")
+    ap.add_argument("--table", type=int, default=-1,
+                    help="Raw events table rows: -1=ALL (can be slow), N=first N rows, 0=disable")
+    ap.add_argument("--slider-steps", type=int, default=150,
+                    help="How many positions the global X-max slider has (bigger = smoother but heavier)")
     args = ap.parse_args()
 
     df = load_csv(args.csv)
-    xmin, xmax = infer_xrange(df, args.xmin, args.xmax)
+    xmin, xmax, _dmin, dmax = infer_xrange(df, args.xmin, args.xmax)
 
-    prefix = Path(args.out_prefix) if args.out_prefix else Path(args.csv).with_suffix("")
-    cpu_out = prefix.with_name(prefix.name + "_cpu.html")
-    life_out = prefix.with_name(prefix.name + "_lifecycle.html")
-    block_out = prefix.with_name(prefix.name + "_blocking.html")
-    events_out = prefix.with_name(prefix.name + "_events.html")
+    out = Path(args.out) if args.out else Path(args.csv).with_suffix("").with_name(Path(args.csv).stem + "_rtos_trace.html")
+    build_report(df, xmin, xmax, dmax, out, args.table, args.slider_steps)
 
-    cpu_timeline = build_cpu_timeline(df, xmin, xmax)
-    lifecycle_segments, creates, deletes = extract_lifecycle(df, xmax)
-    blocking = extract_blocking(df)
-    tasks = stable_task_list(df, cpu_timeline, lifecycle_segments, blocking)
-
-    # --- CPU ---
-    cpu_fig = make_shape_figure("CPU Schedule (Interactive)", tasks, xmin, xmax)
-    cpu_segments = [(t, s, e, {"plot": "CPU"}) for (t, s, e) in cpu_timeline]
-    add_segments(cpu_fig, cpu_segments, tasks, "rgba(0,0,0,0.15)")
-    write_html(cpu_fig, cpu_out)
-
-    # --- Lifecycle ---
-    life_fig = make_shape_figure("Task Lifecycle (Create → Delete)", tasks, xmin, xmax)
-    life_segments = [
-        (t, s, e, {"plot": "LIFECYCLE", "created": creates.get(t, ""), "deleted": deletes.get(t, "")})
-        for (t, s, e) in lifecycle_segments
-    ]
-    add_segments(life_fig, life_segments, tasks, "rgba(0,200,0,0.25)")
-    write_html(life_fig, life_out)
-
-    # --- Blocking ---
-    block_fig = make_shape_figure("Task Blocking / Waiting (RTOS-correct)", tasks, xmin, xmax)
-
-    block_queue, block_delay = [], []
-    for kind, m in blocking.items():
-        for t, segs in m.items():
-            for s, e in segs:
-                item = (t, s, e, {"plot": "BLOCK", "kind": kind})
-                (block_queue if kind == "QUEUE" else block_delay).append(item)
-
-    if block_queue:
-        add_segments(block_fig, block_queue, tasks, "rgba(255,165,0,0.35)")
-    if block_delay:
-        add_segments(block_fig, block_delay, tasks, "rgba(120,120,120,0.35)")
-    write_html(block_fig, block_out)
-
-    # --- Optional events table ---
-    ev_fig = make_events_table_figure(df, "Raw Events (CSV)", args.table)
-    if ev_fig is not None:
-        write_html(ev_fig, events_out)
-
-    print("✅ Generated interactive sections:")
-    print(f" - {cpu_out.resolve()}")
-    print(f" - {life_out.resolve()}")
-    print(f" - {block_out.resolve()}")
-    if ev_fig is not None:
-        print(f" - {events_out.resolve()}")
+    print(f"✅ Wrote interactive report: {out.resolve()}")
 
     if not args.no_open:
-        for p in [cpu_out, life_out, block_out] + ([events_out] if ev_fig is not None else []):
-            try:
-                webbrowser.open("file://" + os.path.abspath(p))
-            except Exception:
-                pass
+        try:
+            webbrowser.open("file://" + os.path.abspath(out))
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
