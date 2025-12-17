@@ -37,7 +37,7 @@ bash local_setup.sh
 ```
 
 ### Step 1: Build, Flash, and Log Data
-From the root project directory (`RTOS`), execute:
+From the root project directory (`RTOS3`), execute:
 ```bash
 ./run.sh
 ```
