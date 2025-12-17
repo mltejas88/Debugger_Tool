@@ -33,7 +33,7 @@
 ### Configure you system :
 Run the local_setup.sh script to install and setup the development environment at ../RTOS3/RTOSExercise path
 ```bash
-bash ./run.sh
+bash local_setup.sh
 ```
 
 ### Step 1: Build, Flash, and Log Data
